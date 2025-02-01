@@ -3,7 +3,7 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 from telebot.handler_backends import State, StatesGroup
 from telebot.storage import StateMemoryStorage
 
-TOKEN = '7612088428:AAHeC5GaCqe7m3EUER3tiNgDr2V0EvQ5FxI'
+TOKEN = ''
 state_storage = StateMemoryStorage()
 bot = telebot.TeleBot(TOKEN, state_storage=state_storage)
 
