@@ -73,6 +73,13 @@ def education_suz_menu():
     markup.add(KeyboardButton("Назад в меню"))
     return markup
 
+# функция для возврата в главное меню из анкеты
+def back_to_main_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(KeyboardButton("Назад в меню"))
+    return markup
+
+
 def contact_channel_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(KeyboardButton("Телефон"))
@@ -102,6 +109,76 @@ def back_to_main(message):
 def employment_practice(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=job_menu())
 
+#менюшка для выбора СУЗа или ВУЗа
+@bot.message_handler(func=lambda message: message.text == "Целевое обучение")
+def targeted_training(message):
+    bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=education_menu())
+
+#меню для выбора, обучается ли уже пользователь в СУЗе или только хочет поступить
+@bot.message_handler(func=lambda message: message.text == "Целевое обучение в СУЗе")
+def targeted_training_suz(message):
+    bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=education_suz_menu())
+
+# Анкета для целевого обучения в сузе начинается отсюда
+@bot.message_handler(func=lambda message: message.text == "Я хочу подписать договор на целевое обучение в СУЗ")
+def start_suz_form(message):
+    user_data[message.chat.id] = {"step": "full_name", "form_type": "SUZ"}
+    bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+def get_full_name_suz(message):
+    user_data[message.chat.id]["full_name"] = message.text
+    user_data[message.chat.id]["step"] = "birth_date"
+    bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "birth_date" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+def get_full_name_suz(message):
+    user_data[message.chat.id]["full_name"] = message.text
+    user_data[message.chat.id]["step"] = "city"
+    bot.send_message(message.chat.id, "В каком городе проживаете?")
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "city" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+def get_city_suz(message):
+    user_data[message.chat.id]["city"] = message.text
+    user_data[message.chat.id]["step"] = "SUZ"
+    bot.send_message(message.chat.id, "В каком СУЗе обучаетесь?")
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "SUZ" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+def get_suz_suz(message):
+    user_data[message.chat.id]["SUZ"] = message.text
+    user_data[message.chat.id]["step"] = "direction_of_training"
+    bot.send_message(message.chat.id, "Какое направление подготовки?")
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "direction_of_training" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+def get_dir_of_train_suz(message):
+    user_data[message.chat.id]["direction_of_training"] = message.text
+    user_data[message.chat.id]["step"] = "contact_channel"
+    bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+def get_contact_channel_suz(message):
+    user_data[message.chat.id]["contact_channel"] = message.text
+    user_data[message.chat.id]["step"] = "phone_number"
+    bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+def get_phone_number_suz(message):
+    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["step"] = "confirm_send"
+
+    application_text = "\n".join(
+        [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if key not in ["step", "form_type"]])
+
+    bot.send_message(message.chat.id,
+                     f"Ваша анкета:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+#конец анкеты СУЗа
 
 # Анкета для "Практическая подготовка"
 @bot.message_handler(func=lambda message: message.text == "Практическая подготовка")
