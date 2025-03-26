@@ -310,6 +310,55 @@ def get_phone_number_entrance_vuz(message):
     bot.send_message(message.chat.id,
                      f"Ваша анкета:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 
+#я уже обучаюсь по договору цо в ВУЗе
+@bot.message_handler(func=lambda message: message.text == "Я уже обучаюсь по договору целевого обучения в ВУЗе")
+def alr_studying_vuz(message):
+    bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=alr_studying_menu())
+    user_data[message.chat.id] = {"step": "full_name", "form_type": "VUZ another question"}
+
+
+#выдача памятки по ВУЗу
+@bot.message_handler(func=lambda message: message.text == "Получить памятку студента целевого обучения" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+def get_memo_vuz(message):
+    bot.send_message(message.chat.id, "Вот ваша памятка:", reply_markup=back_to_main_menu())
+    with open("Буклет ВУЗ.pdf", 'rb') as file:
+        bot.send_document(message.chat.id, file)
+
+#задать другой вопрос
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+def start_another_quest_vuz(message):
+    bot.send_message(message.chat.id, "Введите ваш вопрос:", reply_markup=back_to_main_menu())
+    user_data[message.chat.id]["step"] = "question"
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "question" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+def get_another_quest_vuz(message):
+    user_data[message.chat.id]["quest"] = message.text
+    user_data[message.chat.id]["step"] = "name"
+    bot.send_message(message.chat.id, "Введите ваше имя:", reply_markup=back_to_main_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+def get_name_another_quest_vuz(message):
+    user_data[message.chat.id]["full_name"] = message.text
+    user_data[message.chat.id]["step"] = "contact_channel"
+    bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+def get_contact_channel_vuz(message):
+    user_data[message.chat.id]["contact_channel"] = message.text
+    user_data[message.chat.id]["step"] = "phone_number"
+    bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+def get_phone_number_vuz(message):
+    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["step"] = "confirm_send"
+
+    application_text = "\n".join(
+        [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if key not in ["step", "form_type"]])
+
+    bot.send_message(message.chat.id,
+                     f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 
 # Анкета для "Практическая подготовка"
 @bot.message_handler(func=lambda message: message.text == "Практическая подготовка")
@@ -556,7 +605,7 @@ def confirm_send(message):
         application_text = "\n".join(
             [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if key not in ["step", "form_type"]])
         form_type = user_data[message.chat.id].get("form_type")
-        subject = f"Новая анкета для {'практики' if form_type == 'practice' else 'летнего трудоустройства' if form_type == 'summer_employment' else 'трудоустройства после обучения' if form_type == 'post_study_employment' else 'СУЗа'}"
+        subject = f"Новая анкета для {'практики' if form_type == 'practice' else 'летнего трудоустройства' if form_type == 'summer_employment' else 'трудоустройства после обучения' if form_type == 'post_study_employment' else 'поступления на целевое обучение в ВУЗ' if form_type == 'entrance_vuz' else 'обучается по договору целевого обучения в ВУЗе' if form_type =='VUZ another question' else 'СУЗа'}"
         to_email = EMAIL_ADDRESS
         if send_email(subject, application_text, to_email):
             bot.send_message(message.chat.id, "Анкета успешно отправлена по электронной почте.")
