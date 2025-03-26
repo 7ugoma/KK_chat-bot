@@ -94,6 +94,15 @@ def confirm_menu():
     markup.add(KeyboardButton("Редактировать"))
     return markup
 
+#меню для целевого обучения для получения памятки, стипендии и др. вопроса
+def alr_studying_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(KeyboardButton("Получить памятку студента целевого обучения"))
+    markup.add(KeyboardButton("Узнать, когда придет стипендия"))
+    markup.add(KeyboardButton("Задать другой вопрос"))
+    return markup
+
+
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -118,6 +127,62 @@ def targeted_training(message):
 @bot.message_handler(func=lambda message: message.text == "Целевое обучение в СУЗе")
 def targeted_training_suz(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=education_suz_menu())
+
+
+#суз уже идет обучение
+@bot.message_handler(func=lambda message: message.text == "Я уже обучаюсь по договору целевого обучения в СУЗе")
+def alr_studying_suz(message):
+    bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=alr_studying_menu())
+    user_data[message.chat.id] = {"step": "full_name", "form_type": "SUZ another question"}
+
+
+#выдача памятки по СУЗу
+@bot.message_handler(func=lambda message: message.text == "Получить памятку студента целевого обучения" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+def get_memo_suz(message):
+    bot.send_message(message.chat.id, "Вот ваша памятка:", reply_markup=back_to_main_menu())
+    with open("Буклет СУЗ.pdf", 'rb') as file:
+        bot.send_document(message.chat.id, file)
+
+
+#анкета другого вопроса
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+def start_another_quest_suz(message):
+    bot.send_message(message.chat.id, "Введите ваш вопрос:", reply_markup=back_to_main_menu())
+    user_data[message.chat.id]["step"] = "question"
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "question" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+def get_another_quest_suz(message):
+    user_data[message.chat.id]["quest"] = message.text
+    user_data[message.chat.id]["step"] = "name"
+    bot.send_message(message.chat.id, "Введите ваше имя:", reply_markup=back_to_main_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+def get_name_another_quest_suz(message):
+    user_data[message.chat.id]["full_name"] = message.text
+    user_data[message.chat.id]["step"] = "contact_channel"
+    bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+def get_contact_channel_suz(message):
+    user_data[message.chat.id]["contact_channel"] = message.text
+    user_data[message.chat.id]["step"] = "phone_number"
+    bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
+
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+def get_phone_number_suz(message):
+    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["step"] = "confirm_send"
+
+    application_text = "\n".join(
+        [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if key not in ["step", "form_type"]])
+
+    bot.send_message(message.chat.id,
+                     f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+#конец анкеты СУЗа
+
+
+
 
 # Анкета для целевого обучения в сузе начинается отсюда
 @bot.message_handler(func=lambda message: message.text == "Я хочу подписать договор на целевое обучение в СУЗ")
@@ -491,16 +556,18 @@ def confirm_send(message):
         application_text = "\n".join(
             [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if key not in ["step", "form_type"]])
         form_type = user_data[message.chat.id].get("form_type")
-        subject = f"Новая анкета для {'практики' if form_type == 'practice' else 'летнего трудоустройства' if form_type == 'summer_employment' else 'трудоустройства после обучения'}"
+        subject = f"Новая анкета для {'практики' if form_type == 'practice' else 'летнего трудоустройства' if form_type == 'summer_employment' else 'трудоустройства после обучения' if form_type == 'post_study_employment' else 'СУЗа'}"
         to_email = EMAIL_ADDRESS
         if send_email(subject, application_text, to_email):
             bot.send_message(message.chat.id, "Анкета успешно отправлена по электронной почте.")
         else:
             bot.send_message(message.chat.id, "Ошибка при отправке анкеты по электронной почте.")
         bot.send_message(message.chat.id, f"Анкета отправлена:\n\n{application_text}")
-        bot.send_message(message.chat.id, "Спасибо, что предоставили необходимую информацию о себе, наши специалисты\nобязательно рассмотрят Вашу заявку и вернутся к Вам с конкретным предложением.\nНа данном этапе Вы также можете ознакомиться с памяткой.", reply_markup=main_menu())
-        with open("Памятка_для_будущих_абитуриентов.pdf", 'rb') as file:
-            bot.send_document(message.chat.id, file)
+        bot.send_message(message.chat.id, "Спасибо, что предоставили необходимую информацию о себе, наши специалисты обязательно рассмотрят Вашу заявку и вернутся к Вам с конкретным ответом.", reply_markup=main_menu())
+        if form_type == "practice" or form_type == "practice" or form_type == "post_study_employment":
+            bot.send_message(message.chat.id,"На данном этапе вы можете ознакомиться с памяткой", reply_markup=main_menu())
+            with open("Памятка_для_будущих_абитуриентов.pdf", 'rb') as file:
+                bot.send_document(message.chat.id, file)
         del user_data[message.chat.id]
     elif message.text.lower() == "редактировать":
         user_data[message.chat.id]["step"] = "full_name"
