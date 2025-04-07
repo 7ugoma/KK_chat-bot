@@ -3,7 +3,6 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import re
 
 TOKEN = ''
 bot = telebot.TeleBot(TOKEN)
