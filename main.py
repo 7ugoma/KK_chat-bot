@@ -3,6 +3,7 @@ from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import re
 
 TOKEN = ''
 bot = telebot.TeleBot(TOKEN)
@@ -133,7 +134,7 @@ def targeted_training_suz(message):
 @bot.message_handler(func=lambda message: message.text == "Я уже обучаюсь по договору целевого обучения в СУЗе")
 def alr_studying_suz(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=alr_studying_menu())
-    user_data[message.chat.id] = {"step": "full_name", "form_type": "SUZ another question"}
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "SUZ another question"}
 
 
 #выдача памятки по СУЗу
@@ -145,33 +146,33 @@ def get_memo_suz(message):
 
 
 #анкета другого вопроса
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def start_another_quest_suz(message):
     bot.send_message(message.chat.id, "Введите ваш вопрос:", reply_markup=back_to_main_menu())
     user_data[message.chat.id]["step"] = "question"
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "question" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_another_quest_suz(message):
-    user_data[message.chat.id]["quest"] = message.text
+    user_data[message.chat.id]["Вопрос"] = message.text
     user_data[message.chat.id]["step"] = "name"
-    bot.send_message(message.chat.id, "Введите ваше имя:", reply_markup=back_to_main_menu())
+    bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_name_another_quest_suz(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "contact_channel"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_contact_channel_suz(message):
-    user_data[message.chat.id]["contact_channel"] = message.text
-    user_data[message.chat.id]["step"] = "phone_number"
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_phone_number_suz(message):
-    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
     application_text = "\n".join(
@@ -187,55 +188,55 @@ def get_phone_number_suz(message):
 # Анкета для целевого обучения в сузе начинается отсюда
 @bot.message_handler(func=lambda message: message.text == "Я хочу подписать договор на целевое обучение в СУЗ")
 def start_suz_form(message):
-    user_data[message.chat.id] = {"step": "full_name", "form_type": "SUZ"}
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "SUZ"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_full_name_suz(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "birth_date"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "birth_date" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Дата рождения" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_full_name_suz(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "city"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Город"
     bot.send_message(message.chat.id, "В каком городе проживаете?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "city" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Город" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_city_suz(message):
-    user_data[message.chat.id]["city"] = message.text
-    user_data[message.chat.id]["step"] = "SUZ"
+    user_data[message.chat.id]["Город"] = message.text
+    user_data[message.chat.id]["step"] = "СУЗ"
     bot.send_message(message.chat.id, "В каком СУЗе обучаетесь?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "SUZ" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "СУЗ" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_suz_suz(message):
-    user_data[message.chat.id]["SUZ"] = message.text
-    user_data[message.chat.id]["step"] = "direction_of_training"
+    user_data[message.chat.id]["СУЗ"] = message.text
+    user_data[message.chat.id]["step"] = "Направление подготовки"
     bot.send_message(message.chat.id, "Какое направление подготовки?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "direction_of_training" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Направление подготовки" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_dir_of_train_suz(message):
-    user_data[message.chat.id]["direction_of_training"] = message.text
-    user_data[message.chat.id]["step"] = "contact_channel"
+    user_data[message.chat.id]["Направление подготовки"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_contact_channel_suz(message):
-    user_data[message.chat.id]["contact_channel"] = message.text
-    user_data[message.chat.id]["step"] = "phone_number"
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_phone_number_suz(message):
-    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
     application_text = "\n".join(
@@ -254,54 +255,54 @@ def targeted_training_vuz(message):
 
 @bot.message_handler(func=lambda message: message.text == "Я хочу поступить на целевое обучение в ВУЗ")
 def start_entrance_vuz_form(message):
-    user_data[message.chat.id] = {"step": "full_name", "form_type": "entrance_vuz"}
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "entrance_vuz"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_full_name_entrance_vuz(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "birth_date"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "birth_date" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Дата рождения" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_birth_date_entrance_vuz(message):
-    user_data[message.chat.id]["birth_date"] = message.text
-    user_data[message.chat.id]["step"] = "city"
+    user_data[message.chat.id]["Дата рождения"] = message.text
+    user_data[message.chat.id]["step"] = "Город"
     bot.send_message(message.chat.id, "В каком городе проживаете?")
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "city" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Город" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_city_entrance_vuz(message):
-    user_data[message.chat.id]["city"] = message.text
-    user_data[message.chat.id]["step"] = "result"
+    user_data[message.chat.id]["Город"] = message.text
+    user_data[message.chat.id]["step"] = "Результаты ЕГЭ/вступительных испытаний"
     bot.send_message(message.chat.id, "Результаты ЕГЭ/Результаты вступительных испытаний:")
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "result" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Результаты ЕГЭ/вступительных испытаний" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_result_entrance_vuz(message):
-    user_data[message.chat.id]["result"] = message.text
-    user_data[message.chat.id]["step"] = "variants"
+    user_data[message.chat.id]["Результаты ЕГЭ/вступительных испытаний"] = message.text
+    user_data[message.chat.id]["step"] = "Варианты ВУЗов"
     bot.send_message(message.chat.id, "Какой ВУЗ рассматриваете?")
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "variants" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Варианты ВУЗов" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_variants_entrance_vuz(message):
-    user_data[message.chat.id]["variants"] = message.text
-    user_data[message.chat.id]["step"] = "direction"
+    user_data[message.chat.id]["Варианты ВУЗов"] = message.text
+    user_data[message.chat.id]["step"] = "Направление"
     bot.send_message(message.chat.id, "Какое направление подготовки Вас интересует?")
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "direction" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Направление" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_direction_entrance_vuz(message):
-    user_data[message.chat.id]["direction"] = message.text
-    user_data[message.chat.id]["step"] = "contact_channel"
+    user_data[message.chat.id]["Направление"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_contact_channel_entrance_vuz(message):
-    user_data[message.chat.id]["contact_channel"] = message.text
-    user_data[message.chat.id]["step"] = "phone_number"
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_phone_number_entrance_vuz(message):
-    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
     application_text = "\n".join(
@@ -314,7 +315,7 @@ def get_phone_number_entrance_vuz(message):
 @bot.message_handler(func=lambda message: message.text == "Я уже обучаюсь по договору целевого обучения в ВУЗе")
 def alr_studying_vuz(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=alr_studying_menu())
-    user_data[message.chat.id] = {"step": "full_name", "form_type": "VUZ another question"}
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "VUZ another question"}
 
 
 #выдача памятки по ВУЗу
@@ -325,33 +326,33 @@ def get_memo_vuz(message):
         bot.send_document(message.chat.id, file)
 
 #задать другой вопрос
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def start_another_quest_vuz(message):
     bot.send_message(message.chat.id, "Введите ваш вопрос:", reply_markup=back_to_main_menu())
     user_data[message.chat.id]["step"] = "question"
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "question" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_another_quest_vuz(message):
-    user_data[message.chat.id]["quest"] = message.text
+    user_data[message.chat.id]["Вопрос"] = message.text
     user_data[message.chat.id]["step"] = "name"
-    bot.send_message(message.chat.id, "Введите ваше имя:", reply_markup=back_to_main_menu())
+    bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_name_another_quest_vuz(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "contact_channel"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_contact_channel_vuz(message):
-    user_data[message.chat.id]["contact_channel"] = message.text
-    user_data[message.chat.id]["step"] = "phone_number"
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_phone_number_vuz(message):
-    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
     application_text = "\n".join(
@@ -363,76 +364,76 @@ def get_phone_number_vuz(message):
 # Анкета для "Практическая подготовка"
 @bot.message_handler(func=lambda message: message.text == "Практическая подготовка")
 def start_practice_form(message):
-    user_data[message.chat.id] = {"step": "full_name", "form_type": "practice"}
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "practice"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_full_name_practice(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "birth_date"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "birth_date" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Дата рождения" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_birth_date_practice(message):
-    user_data[message.chat.id]["birth_date"] = message.text
-    user_data[message.chat.id]["step"] = "education"
+    user_data[message.chat.id]["Дата рождения"] = message.text
+    user_data[message.chat.id]["step"] = "Обучаетесь/обучались"
     bot.send_message(message.chat.id, "Где обучаетесь/обучались?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "education" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Обучаетесь/обучались" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_education_practice(message):
-    user_data[message.chat.id]["education"] = message.text
-    user_data[message.chat.id]["step"] = "profession"
+    user_data[message.chat.id]["Обучаетесь/обучались"] = message.text
+    user_data[message.chat.id]["step"] = "Профессия/специальность"
     bot.send_message(message.chat.id, "По какой профессии/специальности?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "profession" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Профессия/специальность" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_profession_practice(message):
-    user_data[message.chat.id]["profession"] = message.text
-    user_data[message.chat.id]["step"] = "course"
+    user_data[message.chat.id]["Профессия/специальность"] = message.text
+    user_data[message.chat.id]["step"] = "Курс"
     bot.send_message(message.chat.id, "Какой курс?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "course" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Курс" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_course_practice(message):
-    user_data[message.chat.id]["course"] = message.text
-    user_data[message.chat.id]["step"] = "practice_duration"
+    user_data[message.chat.id]["Курс"] = message.text
+    user_data[message.chat.id]["step"] = "Сроки практики"
     bot.send_message(message.chat.id, "Сроки практики?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "practice_duration" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Сроки практики" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_practice_duration_practice(message):
-    user_data[message.chat.id]["practice_duration"] = message.text
-    user_data[message.chat.id]["step"] = "previous_practice"
+    user_data[message.chat.id]["Сроки практики"] = message.text
+    user_data[message.chat.id]["step"] = "Прошлая практика"
     bot.send_message(message.chat.id, "Проходили ли практику ранее? Если да, то где?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "previous_practice" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Прошлая практика" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_previous_practice_practice(message):
-    user_data[message.chat.id]["previous_practice"] = message.text
-    user_data[message.chat.id]["step"] = "same_department"
+    user_data[message.chat.id]["Прошлая практика"] = message.text
+    user_data[message.chat.id]["step"] = "Желание пройти практику в том же подразделении"
     bot.send_message(message.chat.id, "Хотели бы пройти практику в том же подразделении? (Да/Нет)")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "same_department" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Желание пройти практику в том же подразделении" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_same_department_practice(message):
-    user_data[message.chat.id]["same_department"] = message.text
-    user_data[message.chat.id]["step"] = "contact_channel"
+    user_data[message.chat.id]["Желание пройти практику в том же подразделении"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_contact_channel_practice(message):
-    user_data[message.chat.id]["contact_channel"] = message.text
-    user_data[message.chat.id]["step"] = "phone_number"
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_phone_number_practice(message):
-    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
     application_text = "\n".join(
@@ -445,69 +446,69 @@ def get_phone_number_practice(message):
 # Анкета для "Летнее трудоустройство"
 @bot.message_handler(func=lambda message: message.text == "Летнее трудоустройство")
 def start_summer_employment_form(message):
-    user_data[message.chat.id] = {"step": "full_name", "form_type": "summer_employment"}
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "summer_employment"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_full_name_summer(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "birth_date"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "birth_date" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Дата рождения" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_birth_date_summer(message):
-    user_data[message.chat.id]["birth_date"] = message.text
-    user_data[message.chat.id]["step"] = "education"
+    user_data[message.chat.id]["Дата рождения"] = message.text
+    user_data[message.chat.id]["step"] = "Обучаетесь/обучались"
     bot.send_message(message.chat.id, "Где обучаетесь/обучались?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "education" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Обучаетесь/обучались" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_education_summer(message):
-    user_data[message.chat.id]["education"] = message.text
-    user_data[message.chat.id]["step"] = "profession"
+    user_data[message.chat.id]["Обучаетесь/обучались"] = message.text
+    user_data[message.chat.id]["step"] = "Профессия/специальность"
     bot.send_message(message.chat.id, "По какой профессии/специальности?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "profession" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Профессия/специальность" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_profession_summer(message):
-    user_data[message.chat.id]["profession"] = message.text
-    user_data[message.chat.id]["step"] = "course"
+    user_data[message.chat.id]["Профессия/специальность"] = message.text
+    user_data[message.chat.id]["step"] = "Курс"
     bot.send_message(message.chat.id, "Какой курс?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "course" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Курс" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_course_summer(message):
-    user_data[message.chat.id]["course"] = message.text
-    user_data[message.chat.id]["step"] = "employment_period"
+    user_data[message.chat.id]["Курс"] = message.text
+    user_data[message.chat.id]["step"] = "Период трудоустройства"
     bot.send_message(message.chat.id, "На какой период рассматриваете трудоустройство?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "employment_period" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Период трудоустройства" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_employment_period_summer(message):
-    user_data[message.chat.id]["employment_period"] = message.text
-    user_data[message.chat.id]["step"] = "previous_work"
+    user_data[message.chat.id]["Период трудоустройства"] = message.text
+    user_data[message.chat.id]["step"] = "Опыт работы"
     bot.send_message(message.chat.id, "Работали ли Вы ранее, если да, то где?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "previous_work" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Опыт работы" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_previous_work_summer(message):
-    user_data[message.chat.id]["previous_work"] = message.text
-    user_data[message.chat.id]["step"] = "contact_channel"
+    user_data[message.chat.id]["Опыт работы"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_contact_channel_summer(message):
-    user_data[message.chat.id]["contact_channel"] = message.text
-    user_data[message.chat.id]["step"] = "phone_number"
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_phone_number_summer(message):
-    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
     application_text = "\n".join(
@@ -520,76 +521,76 @@ def get_phone_number_summer(message):
 # Анкета для "Трудоустройство после обучения"
 @bot.message_handler(func=lambda message: message.text == "Трудоустройство после обучения")
 def start_post_study_employment_form(message):
-    user_data[message.chat.id] = {"step": "full_name", "form_type": "post_study_employment"}
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "post_study_employment"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "full_name" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_full_name_post_study(message):
-    user_data[message.chat.id]["full_name"] = message.text
-    user_data[message.chat.id]["step"] = "birth_date"
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "birth_date" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Дата рождения" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_birth_date_post_study(message):
-    user_data[message.chat.id]["birth_date"] = message.text
-    user_data[message.chat.id]["step"] = "education"
+    user_data[message.chat.id]["Дата рождения"] = message.text
+    user_data[message.chat.id]["step"] = "Обучаетесь/обучались"
     bot.send_message(message.chat.id, "Где обучаетесь/обучались?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "education" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Обучаетесь/обучались" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_education_post_study(message):
-    user_data[message.chat.id]["education"] = message.text
-    user_data[message.chat.id]["step"] = "profession"
+    user_data[message.chat.id]["Обучаетесь/обучались"] = message.text
+    user_data[message.chat.id]["step"] = "Профессия/специальность"
     bot.send_message(message.chat.id, "По какой профессии/специальности?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "profession" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Профессия/специальность" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_profession_post_study(message):
-    user_data[message.chat.id]["profession"] = message.text
-    user_data[message.chat.id]["step"] = "course"
+    user_data[message.chat.id]["Профессия/специальность"] = message.text
+    user_data[message.chat.id]["step"] = "Курс"
     bot.send_message(message.chat.id, "Какой курс?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "course" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Курс" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_course_post_study(message):
-    user_data[message.chat.id]["course"] = message.text
-    user_data[message.chat.id]["step"] = "practice_duration"
+    user_data[message.chat.id]["Курс"] = message.text
+    user_data[message.chat.id]["step"] = "Сроки практики"
     bot.send_message(message.chat.id, "Сроки практики?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "practice_duration" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Сроки практики" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_practice_duration_post_study(message):
-    user_data[message.chat.id]["practice_duration"] = message.text
-    user_data[message.chat.id]["step"] = "previous_practice"
+    user_data[message.chat.id]["Сроки практики"] = message.text
+    user_data[message.chat.id]["step"] = "Прошлая практика"
     bot.send_message(message.chat.id, "Проходили ли практику ранее? Если да, то где?")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "previous_practice" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Прошлая практика" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_previous_practice_post_study(message):
-    user_data[message.chat.id]["previous_practice"] = message.text
-    user_data[message.chat.id]["step"] = "same_department"
+    user_data[message.chat.id]["Прошлая практика"] = message.text
+    user_data[message.chat.id]["step"] = "Желание пройти практику в том же подразделении"
     bot.send_message(message.chat.id, "Хотели бы пройти практику в том же подразделении? (Да/Нет)")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "same_department" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Желание пройти практику в том же подразделении" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_same_department_post_study(message):
-    user_data[message.chat.id]["same_department"] = message.text
-    user_data[message.chat.id]["step"] = "contact_channel"
+    user_data[message.chat.id]["Желание пройти практику в том же подразделении"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "contact_channel" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_contact_channel_post_study(message):
-    user_data[message.chat.id]["contact_channel"] = message.text
-    user_data[message.chat.id]["step"] = "phone_number"
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:")
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "phone_number" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_phone_number_post_study(message):
-    user_data[message.chat.id]["phone_number"] = message.text
+    user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
     application_text = "\n".join(
@@ -619,7 +620,7 @@ def confirm_send(message):
                 bot.send_document(message.chat.id, file)
         del user_data[message.chat.id]
     elif message.text.lower() == "редактировать":
-        user_data[message.chat.id]["step"] = "full_name"
+        user_data[message.chat.id]["step"] = "Ф.И.О"
         bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
     else:
         bot.send_message(message.chat.id,
