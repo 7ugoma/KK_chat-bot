@@ -182,8 +182,6 @@ def get_phone_number_suz(message):
 #конец анкеты СУЗа
 
 
-
-
 # Анкета для целевого обучения в сузе начинается отсюда
 @bot.message_handler(func=lambda message: message.text == "Я хочу подписать договор на целевое обучение в СУЗ")
 def start_suz_form(message):
