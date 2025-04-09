@@ -49,6 +49,14 @@ def job_menu():
     markup.add(KeyboardButton("Назад в меню"))
     return markup
 
+# Функция для создания меню "Другое"
+def another_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(KeyboardButton("Задайте свой вопрос"))
+    markup.add(KeyboardButton("Назад в меню"))
+    return markup
+
+
 # Функция для создания меню "Целевое обучение"
 def education_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -106,7 +114,7 @@ def alr_studying_menu():
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, "Выберите нужный раздел:", reply_markup=main_menu())
+    bot.send_message(message.chat.id, "Текст-заглушка, потом тут будет приветствие:", reply_markup=main_menu())
 
 
 @bot.message_handler(func=lambda message: message.text == "Назад в меню")
@@ -122,6 +130,51 @@ def employment_practice(message):
 @bot.message_handler(func=lambda message: message.text == "Целевое обучение")
 def targeted_training(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=education_menu())
+    user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "SUZ another question"}
+
+
+#меню ветки другое
+@bot.message_handler(func=lambda message: message.text == "Другое")
+def ask_question_other(message):
+    bot.send_message(message.chat.id, "Задайте свой вопрос:", reply_markup=back_to_main_menu())
+    user_data[message.chat.id] = {"step": "Вопрос", "form_type": "Another Question"}
+
+#начало другого вопроса
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
+def get_another_quest_suz(message):
+    user_data[message.chat.id]["Вопрос"] = message.text
+    user_data[message.chat.id]["step"] = "name"
+    bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id,{}).get("form_type") == "Another Question")
+def get_name_another_quest(message):
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
+    bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id,{}).get("form_type") == "Another Question")
+def get_name_another_quest_suz(message):
+    user_data[message.chat.id]["Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "Канал связи"
+    bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
+def get_contact_channel_suz(message):
+    user_data[message.chat.id]["Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "Номер телефона"
+    bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
+
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
+def get_phone_number_suz(message):
+    user_data[message.chat.id]["Номер телефона"] = message.text
+    user_data[message.chat.id]["step"] = "confirm_send"
+
+    application_text = "\n".join(
+        [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if
+         key not in ["step", "form_type"]])
+
+    bot.send_message(message.chat.id,f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+ #конец другого вопроса
 
 #меню для выбора, обучается ли уже пользователь в СУЗе или только хочет поступить
 @bot.message_handler(func=lambda message: message.text == "Целевое обучение в СУЗе")
@@ -611,7 +664,7 @@ def confirm_send(message):
             bot.send_message(message.chat.id, "Ошибка при отправке анкеты по электронной почте.")
         bot.send_message(message.chat.id, f"Анкета отправлена:\n\n{application_text}")
         bot.send_message(message.chat.id, "Спасибо, что предоставили необходимую информацию о себе, наши специалисты обязательно рассмотрят Вашу заявку и вернутся к Вам с конкретным ответом.", reply_markup=main_menu())
-        if form_type == "practice" or form_type == "practice" or form_type == "post_study_employment":
+        if form_type == "practice" or form_type == "summer_employment" or form_type == "post_study_employment":
             bot.send_message(message.chat.id,"На данном этапе вы можете ознакомиться с памяткой", reply_markup=main_menu())
             with open("Памятка_для_будущих_абитуриентов.pdf", 'rb') as file:
                 bot.send_document(message.chat.id, file)
