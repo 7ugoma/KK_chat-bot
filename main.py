@@ -141,31 +141,26 @@ def ask_question_other(message):
 
 #начало другого вопроса
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
-def get_another_quest_suz(message):
+def get_another_quest_drugoe(message):
     user_data[message.chat.id]["Вопрос"] = message.text
     user_data[message.chat.id]["step"] = "name"
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id,{}).get("form_type") == "Another Question")
-def get_name_another_quest(message):
+def get_name_drugoe(message):
     user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id,{}).get("form_type") == "Another Question")
-def get_name_another_quest_suz(message):
-    user_data[message.chat.id]["Ф.И.О"] = message.text
-    user_data[message.chat.id]["step"] = "Канал связи"
-    bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
-def get_contact_channel_suz(message):
+def get_contact_channel_drugoe(message):
     user_data[message.chat.id]["Канал связи"] = message.text
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
-def get_phone_number_suz(message):
+def get_phone_number_drugoe(message):
     user_data[message.chat.id]["Номер телефона"] = message.text
     user_data[message.chat.id]["step"] = "confirm_send"
 
