@@ -28,32 +28,32 @@ def send_email(subject, body, to_email):
 
         return True
     except Exception as e:
-        print(f"Ошибка при отправке email: {e}")
+        print(f"❌ Ошибка при отправке email: {e}")
         return False
 
 
 def main_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("Трудоустройство/практика"))
-    markup.add(KeyboardButton("Целевое обучение"))
-    markup.add(KeyboardButton("Мероприятия"))
+    markup.add(KeyboardButton("💼 Трудоустройство/практика"))
+    markup.add(KeyboardButton("🎓 Целевое обучение"))
+    markup.add(KeyboardButton("📅 Мероприятия"))
     markup.add(KeyboardButton("Другое"))
     return markup
 
 
 def job_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("Практическая подготовка"))
-    markup.add(KeyboardButton("Летнее трудоустройство"))
-    markup.add(KeyboardButton("Трудоустройство после обучения"))
-    markup.add(KeyboardButton("Назад в меню"))
+    markup.add(KeyboardButton("💪 Практическая подготовка"))
+    markup.add(KeyboardButton("☀️ Летнее трудоустройство"))
+    markup.add(KeyboardButton("👨🏼‍🎓 Трудоустройство после обучения"))
+    markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
 # Функция для создания меню "Другое"
 def another_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(KeyboardButton("Задайте свой вопрос"))
-    markup.add(KeyboardButton("Назад в меню"))
+    markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
 
@@ -62,7 +62,7 @@ def education_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(KeyboardButton("Целевое обучение в ВУЗе"))
     markup.add(KeyboardButton("Целевое обучение в СУЗе"))
-    markup.add(KeyboardButton("Назад в меню"))
+    markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
 # Функция для создания меню "Целевое обучение в ВУЗе "
@@ -70,7 +70,7 @@ def education_vuz_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(KeyboardButton("Я хочу поступить на целевое обучение в ВУЗ"))
     markup.add(KeyboardButton("Я уже обучаюсь по договору целевого обучения в ВУЗе"))
-    markup.add(KeyboardButton("Назад в меню"))
+    markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
 # Функция для создания меню "Целевое обучение в СУЗе "
@@ -78,13 +78,13 @@ def education_suz_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(KeyboardButton("Я хочу подписать договор на целевое обучение в СУЗ"))
     markup.add(KeyboardButton("Я уже обучаюсь по договору целевого обучения в СУЗе"))
-    markup.add(KeyboardButton("Назад в меню"))
+    markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
 # функция для возврата в главное меню из анкеты
 def back_to_main_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("Назад в меню"))
+    markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
 
@@ -98,15 +98,15 @@ def contact_channel_menu():
 
 def confirm_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("Отправить"))
-    markup.add(KeyboardButton("Редактировать"))
+    markup.add(KeyboardButton("📩 Отправить"))
+    markup.add(KeyboardButton("✏️ Редактировать"))
     return markup
 
 #меню для целевого обучения для получения памятки, стипендии и др. вопроса
 def alr_studying_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("Получить памятку студента целевого обучения"))
-    markup.add(KeyboardButton("Узнать, когда придет стипендия"))
+    markup.add(KeyboardButton("📜 Получить памятку студента целевого обучения"))
+    markup.add(KeyboardButton("💰 Узнать, когда придет стипендия"))
     markup.add(KeyboardButton("Задать другой вопрос"))
     return markup
 
@@ -117,17 +117,17 @@ def start(message):
     bot.send_message(message.chat.id, "Текст-заглушка, потом тут будет приветствие:", reply_markup=main_menu())
 
 
-@bot.message_handler(func=lambda message: message.text == "Назад в меню")
+@bot.message_handler(func=lambda message: message.text == "🔙 Назад в меню")
 def back_to_main(message):
     bot.send_message(message.chat.id, "Вы вернулись в главное меню:", reply_markup=main_menu())
 
 
-@bot.message_handler(func=lambda message: message.text == "Трудоустройство/практика")
+@bot.message_handler(func=lambda message: message.text == "💼 Трудоустройство/практика")
 def employment_practice(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=job_menu())
 
 #менюшка для выбора СУЗа или ВУЗа
-@bot.message_handler(func=lambda message: message.text == "Целевое обучение")
+@bot.message_handler(func=lambda message: message.text == "🎓 Целевое обучение")
 def targeted_training(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=education_menu())
     user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "SUZ another question"}
@@ -185,7 +185,7 @@ def alr_studying_suz(message):
 
 
 #выдача памятки по СУЗу
-@bot.message_handler(func=lambda message: message.text == "Получить памятку студента целевого обучения" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+@bot.message_handler(func=lambda message: message.text == "📜 Получить памятку студента целевого обучения" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_memo_suz(message):
     bot.send_message(message.chat.id, "Вот ваша памятка:", reply_markup=back_to_main_menu())
     with open("Буклет СУЗ.pdf", 'rb') as file:
@@ -364,7 +364,7 @@ def alr_studying_vuz(message):
 
 
 #выдача памятки по ВУЗу
-@bot.message_handler(func=lambda message: message.text == "Получить памятку студента целевого обучения" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+@bot.message_handler(func=lambda message: message.text == "📜 Получить памятку студента целевого обучения" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_memo_vuz(message):
     bot.send_message(message.chat.id, "Вот ваша памятка:", reply_markup=back_to_main_menu())
     with open("Буклет ВУЗ.pdf", 'rb') as file:
@@ -407,7 +407,7 @@ def get_phone_number_vuz(message):
                      f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 
 # Анкета для "Практическая подготовка"
-@bot.message_handler(func=lambda message: message.text == "Практическая подготовка")
+@bot.message_handler(func=lambda message: message.text == "💪 Практическая подготовка")
 def start_practice_form(message):
     user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "practice"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
@@ -489,7 +489,7 @@ def get_phone_number_practice(message):
 
 
 # Анкета для "Летнее трудоустройство"
-@bot.message_handler(func=lambda message: message.text == "Летнее трудоустройство")
+@bot.message_handler(func=lambda message: message.text == "☀️ Летнее трудоустройство")
 def start_summer_employment_form(message):
     user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "summer_employment"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
@@ -564,7 +564,7 @@ def get_phone_number_summer(message):
 
 
 # Анкета для "Трудоустройство после обучения"
-@bot.message_handler(func=lambda message: message.text == "Трудоустройство после обучения")
+@bot.message_handler(func=lambda message: message.text == "👨🏼‍🎓 Трудоустройство после обучения")
 def start_post_study_employment_form(message):
     user_data[message.chat.id] = {"step": "Ф.И.О", "form_type": "post_study_employment"}
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
@@ -647,24 +647,24 @@ def get_phone_number_post_study(message):
 # Общий обработчик для подтверждения отправки
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "confirm_send")
 def confirm_send(message):
-    if message.text.lower() == "отправить":
+    if message.text.lower() == "отправить 📩":
         application_text = "\n".join(
             [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if key not in ["step", "form_type"]])
         form_type = user_data[message.chat.id].get("form_type")
         subject = f"Новая анкета для {'практики' if form_type == 'practice' else 'летнего трудоустройства' if form_type == 'summer_employment' else 'трудоустройства после обучения' if form_type == 'post_study_employment' else 'поступления на целевое обучение в ВУЗ' if form_type == 'entrance_vuz' else 'обучается по договору целевого обучения в ВУЗе' if form_type =='VUZ another question' else 'СУЗа'}"
         to_email = EMAIL_ADDRESS
         if send_email(subject, application_text, to_email):
-            bot.send_message(message.chat.id, "Анкета успешно отправлена по электронной почте.")
+            bot.send_message(message.chat.id, "✔️ Анкета успешно отправлена по электронной почте.")
         else:
-            bot.send_message(message.chat.id, "Ошибка при отправке анкеты по электронной почте.")
+            bot.send_message(message.chat.id, "❌ Ошибка при отправке анкеты по электронной почте.")
         bot.send_message(message.chat.id, f"Анкета отправлена:\n\n{application_text}")
-        bot.send_message(message.chat.id, "Спасибо, что предоставили необходимую информацию о себе, наши специалисты обязательно рассмотрят Вашу заявку и вернутся к Вам с конкретным ответом.", reply_markup=main_menu())
+        bot.send_message(message.chat.id, "Спасибо, что предоставили необходимую информацию о себе 😊, наши специалисты обязательно рассмотрят Вашу заявку и вернутся к Вам с конкретным ответом 😉", reply_markup=main_menu())
         if form_type == "practice" or form_type == "summer_employment" or form_type == "post_study_employment":
-            bot.send_message(message.chat.id,"На данном этапе вы можете ознакомиться с памяткой", reply_markup=main_menu())
+            bot.send_message(message.chat.id,"📜 На данном этапе вы можете ознакомиться с памяткой", reply_markup=main_menu())
             with open("Памятка_для_будущих_абитуриентов.pdf", 'rb') as file:
                 bot.send_document(message.chat.id, file)
         del user_data[message.chat.id]
-    elif message.text.lower() == "редактировать":
+    elif message.text.lower() == "✏️ редактировать":
         user_data[message.chat.id]["step"] = "Ф.И.О"
         bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
     else:
