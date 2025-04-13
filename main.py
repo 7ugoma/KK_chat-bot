@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import re
 
-TOKEN = '8139551283:AAFrXOthUkgeCgNHS4c2-XamSWM6DQpKKrk'
+TOKEN = ''
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
@@ -127,16 +127,6 @@ def check_phone_number(phone_number):
     else:
         return False
 
-#проверка ФИО
-def check_fio(fio):
-    pattern = r"^[А-ЯЁ][а-яё]+ [А-ЯЁ][а-яё]+ [А-ЯЁ][а-яё]+$" #регулярное выражение
-    if re.match(pattern, fio): #сравнение строки с регулярным выражением
-        return True
-    else:
-        return False
-
-# Пример использования
-
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -174,13 +164,7 @@ def get_another_quest_drugoe(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id,{}).get("form_type") == "Another Question")
 def get_name_drugoe(message):
-    msg = message.text
-    if check_fio(msg):
-        user_data[message.chat.id]["Ф.И.О"] = message.text
-    else:
-        bot.send_message(message.chat.id, "Пожалуйста, проверьте корректность ввода данных: например Иванов Иван Иванович")
-        return 0
-
+    user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
@@ -242,13 +226,7 @@ def get_another_quest_suz(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_name_another_quest_suz(message):
-    msg = message.text
-    if check_fio(msg):
-        user_data[message.chat.id]["Ф.И.О"] = message.text
-    else:
-        bot.send_message(message.chat.id,
-                         "Пожалуйста, проверьте корректность ввода данных: например Иванов Иван Иванович")
-        return 0
+    user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
@@ -287,13 +265,7 @@ def start_suz_form(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_full_name_suz(message):
-    msg = message.text
-    if check_fio(msg):
-        user_data[message.chat.id]["Ф.И.О"] = message.text
-    else:
-        bot.send_message(message.chat.id,
-                         "Пожалуйста, проверьте корректность ввода данных: например Иванов Иван Иванович")
-        return 0
+    user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
@@ -370,13 +342,7 @@ def start_entrance_vuz_form(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_full_name_entrance_vuz(message):
-    msg = message.text
-    if check_fio(msg):
-        user_data[message.chat.id]["Ф.И.О"] = message.text
-    else:
-        bot.send_message(message.chat.id,
-                         "Пожалуйста, проверьте корректность ввода данных: например Иванов Иван Иванович")
-        return 0
+    user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
@@ -466,13 +432,7 @@ def get_another_quest_vuz(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_name_another_quest_vuz(message):
-    msg = message.text
-    if check_fio(msg):
-        user_data[message.chat.id]["Ф.И.О"] = message.text
-    else:
-        bot.send_message(message.chat.id,
-                         "Пожалуйста, проверьте корректность ввода данных: например Иванов Иван Иванович")
-        return 0
+    user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
@@ -508,13 +468,7 @@ def start_practice_form(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_full_name_practice(message):
-    msg = message.text
-    if check_fio(msg):
-        user_data[message.chat.id]["Ф.И.О"] = message.text
-    else:
-        bot.send_message(message.chat.id,
-                         "Пожалуйста, проверьте корректность ввода данных: например Иванов Иван Иванович")
-        return 0
+    user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
@@ -606,13 +560,7 @@ def start_summer_employment_form(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_full_name_summer(message):
-    msg = message.text
-    if check_fio(msg):
-        user_data[message.chat.id]["Ф.И.О"] = message.text
-    else:
-        bot.send_message(message.chat.id,
-                         "Пожалуйста, проверьте корректность ввода данных: например Иванов Иван Иванович")
-        return 0
+    user_data[message.chat.id]["Ф.И.О"] = message.text
     user_data[message.chat.id]["step"] = "Дата рождения"
     bot.send_message(message.chat.id, "Введите вашу дату рождения (дд.мм.гггг):")
 
