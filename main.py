@@ -193,7 +193,7 @@ def get_memo_suz(message):
 
 
 #анкета другого вопроса
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+@bot.message_handler(func=lambda message: message.text == "Задать другой вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def start_another_quest_suz(message):
     bot.send_message(message.chat.id, "Введите ваш вопрос:", reply_markup=back_to_main_menu())
     user_data[message.chat.id]["step"] = "question"
@@ -371,7 +371,7 @@ def get_memo_vuz(message):
         bot.send_document(message.chat.id, file)
 
 #задать другой вопрос
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Ф.И.О" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+@bot.message_handler(func=lambda message: message.text == "Задать другой вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def start_another_quest_vuz(message):
     bot.send_message(message.chat.id, "Введите ваш вопрос:", reply_markup=back_to_main_menu())
     user_data[message.chat.id]["step"] = "question"
