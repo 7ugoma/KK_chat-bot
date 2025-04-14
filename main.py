@@ -7,12 +7,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import re
 
-TOKEN = ''
+TOKEN = '7972337639:AAGE7tBGwnOFMGszePn_1cc9enwswDwfKs0'
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
-EMAIL_ADDRESS = ""
-PASSWORD = ""
+EMAIL_ADDRESS = "makeeva-sofia@mail.ru"
+PASSWORD = "qqqqqq"
 
 
 def send_email(subject, body, to_email):
@@ -40,7 +40,7 @@ def main_menu():
     markup.add(KeyboardButton("💼 Трудоустройство/практика"))
     markup.add(KeyboardButton("🎓 Целевое обучение"))
     markup.add(KeyboardButton("📅 Мероприятия"))
-    markup.add(KeyboardButton("Другое"))
+    markup.add(KeyboardButton("💬 Другое"))
     return markup
 
 
@@ -55,7 +55,7 @@ def job_menu():
 # Функция для создания меню "Другое"
 def another_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("Задайте свой вопрос"))
+    markup.add(KeyboardButton("❓ Задайте свой вопрос"))
     markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
@@ -110,7 +110,7 @@ def alr_studying_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(KeyboardButton("📜 Получить памятку студента целевого обучения"))
     markup.add(KeyboardButton("💰 Узнать, когда придет стипендия"))
-    markup.add(KeyboardButton("Задать другой вопрос"))
+    markup.add(KeyboardButton("❓ Задать другой вопрос"))
     return markup
 
 #проверка корректности воода даты рождения
@@ -132,7 +132,7 @@ def check_phone_number(phone_number):
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, "Текст-заглушка, потом тут будет приветствие:", reply_markup=main_menu())
+    bot.send_message(message.chat.id, "Привет!👋 Это виртуальный помощник от АО «Концерн Калашников» . Задайте свой вопрос или выберете один из предложенных вариантов.\n\nЧтобы вернуться в начало или запустить чат-бот заново напишите\n/start", reply_markup=main_menu())
 
 
 @bot.message_handler(func=lambda message: message.text == "🔙 Назад в меню")
@@ -152,36 +152,36 @@ def targeted_training(message):
 
 
 #меню ветки другое
-@bot.message_handler(func=lambda message: message.text == "Другое")
+@bot.message_handler(func=lambda message: message.text == "💬 Другое")
 def ask_question_other(message):
     bot.send_message(message.chat.id, "Задайте свой вопрос:", reply_markup=back_to_main_menu())
-    user_data[message.chat.id] = {"step": "Вопрос", "form_type": "Another Question"}
+    user_data[message.chat.id] = {"step": "❓ Вопрос", "form_type": "Another Question"}
 
 #начало другого вопроса
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "❓ Вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
 def get_another_quest_drugoe(message):
-    user_data[message.chat.id]["Вопрос"] = message.text
+    user_data[message.chat.id]["❓ Вопрос"] = message.text
     user_data[message.chat.id]["step"] = "name"
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id,{}).get("form_type") == "Another Question")
 def get_name_drugoe(message):
-    user_data[message.chat.id]["Ф.И.О"] = message.text
-    user_data[message.chat.id]["step"] = "Канал связи"
+    user_data[message.chat.id]["ℹ️ Ф.И.О"] = message.text
+    user_data[message.chat.id]["step"] = "🌐 Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🌐 Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
 def get_contact_channel_drugoe(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
-    user_data[message.chat.id]["step"] = "Номер телефона"
+    user_data[message.chat.id]["🌐 Канал связи"] = message.text
+    user_data[message.chat.id]["step"] = "📞 Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона в формате +71234567890 или 81234567890:", reply_markup=back_to_main_menu())
 
-@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
+@bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "📞 Номер телефона" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
 def get_phone_number_drugoe(message):
     msg = message.text
     if check_phone_number(msg):
-        user_data[message.chat.id]["Номер телефона"] = msg
+        user_data[message.chat.id]["📞 Номер телефона"] = msg
     else:
         bot.send_message(message.chat.id, "Пожалуйста, проверьте корректность ввода данных: +71234567890 или 81234567890")
         return 0
