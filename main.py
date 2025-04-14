@@ -7,12 +7,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import re
 
-TOKEN = '7972337639:AAGE7tBGwnOFMGszePn_1cc9enwswDwfKs0'
+TOKEN = ''
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
-EMAIL_ADDRESS = "makeeva-sofia@mail.ru"
-PASSWORD = "qqqqqq"
+EMAIL_ADDRESS = ""
+PASSWORD = ""
 
 
 def send_email(subject, body, to_email):
