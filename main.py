@@ -1,4 +1,6 @@
 import telebot
+import pandas as pd
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import smtplib
 from email.mime.text import MIMEText
@@ -755,4 +757,45 @@ def confirm_send(message):
                          "Пожалуйста, напишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 
 
+@bot.message_handler(func=lambda message: message.text == "📅 Мероприятия")
+def show_events(message):
+    try:
+        df = pd.read_excel('events.xlsx')
+
+        markup = InlineKeyboardMarkup()
+
+        for index, row in df.iterrows():
+            event_name = row.iloc[0]
+            event_date = row.iloc[1]
+            event_url = row.iloc[2]
+
+
+            try:
+                event_date = pd.to_datetime(event_date).strftime('%d.%m.%Y')
+            except:
+                pass
+
+            button_text = f"{event_name} ({event_date})"
+
+            if isinstance(event_url, str) and event_url.startswith(('http://', 'https://')):
+                markup.add(InlineKeyboardButton(text=button_text, url=event_url))
+            else:
+                print(f"Неверный URL для мероприятия: {event_name}")
+
+        if not markup.keyboard:
+            bot.send_message(message.chat.id, "На данный момент нет доступных мероприятий.")
+            return
+
+        back_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        back_markup.add(KeyboardButton("🔙 Назад в меню"))
+
+        bot.send_message(message.chat.id, "Выберите мероприятие:", reply_markup=markup)
+
+        bot.send_message(message.chat.id, "Чтобы вернуться в главное меню:", reply_markup=back_markup)
+
+    except Exception as e:
+        print(f"Ошибка при чтении файла мероприятий: {e}")
+        bot.send_message(message.chat.id,
+                         "В данный момент информация о мероприятиях недоступна. Пожалуйста, попробуйте позже.",
+                         reply_markup=main_menu())
 bot.polling(none_stop=True)
