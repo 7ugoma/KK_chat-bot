@@ -7,12 +7,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import re
 
-TOKEN = '7983356108:AAGiBAXrAHyk4RMSxE_d1QqGZMfUyN21lWg'
+TOKEN = ''
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
-EMAIL_ADDRESS = "zav.vladis@gmail.com"
-PASSWORD = "tgue fdkb vcif psuh"
+EMAIL_ADDRESS = ""
+PASSWORD = ""
 
 
 def send_email(subject, body, to_email):
@@ -116,6 +116,30 @@ def alr_studying_menu():
 
 #функции для проверок корректности ввода данных в анкетах
 #проверка корректности воода даты рождения
+def check_contact_channel(channel):
+    if str(channel).lower() in ["телефон", "whatsapp", "telegram"]:
+        return True
+
+    else:
+        return False
+
+def check_simple_question(answer):
+    if str(answer).lower() in ["да", 'нет']:
+        return True
+
+    else:
+        return False
+
+def check_dates(birthdate):
+  pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d-(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d$" # Регулярное выражение для формата ДД.ММ.ГГГГ
+
+  if re.match(pattern, birthdate): # Проверка соответствия регулярному выражению
+    return True
+
+  else:
+    return False
+
+
 def check_birthdate(birthdate):
   pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d$" # Регулярное выражение для формата ДД.ММ.ГГГГ
 
@@ -196,7 +220,15 @@ def get_name_drugoe(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🌐 Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
 def get_contact_channel_drugoe(message):
-    user_data[message.chat.id]["🌐 Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["🌐 Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
+
     user_data[message.chat.id]["step"] = "📞 Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона в формате +71234567890 или 81234567890:", reply_markup=back_to_main_menu())
 
@@ -270,7 +302,14 @@ def get_name_another_quest_suz(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_contact_channel_suz(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
@@ -350,7 +389,14 @@ def get_dir_of_train_suz(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
 def get_contact_channel_suz(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
@@ -435,7 +481,14 @@ def get_direction_entrance_vuz(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
 def get_contact_channel_entrance_vuz(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
@@ -503,7 +556,14 @@ def get_name_another_quest_vuz(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_contact_channel_vuz(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:", reply_markup=back_to_main_menu())
 
@@ -580,7 +640,14 @@ def get_course_practice(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Сроки практики" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_practice_duration_practice(message):
-    user_data[message.chat.id]["Сроки практики"] = message.text
+    msg = message.text
+    if check_dates(msg):
+        user_data[message.chat.id]["Сроки практики"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, перепроверьте, в правильном ли вы формате написали, т.е.: дд.мм.гггг-дд.мм.гггг")
+        return 0
+
     user_data[message.chat.id]["step"] = "Прошлая практика"
     bot.send_message(message.chat.id, "Проходили ли практику ранее? Если да, то где?")
 
@@ -594,14 +661,28 @@ def get_previous_practice_practice(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Желание пройти практику в том же подразделении" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_same_department_practice(message):
-    user_data[message.chat.id]["Желание пройти практику в том же подразделении"] = message.text
+    msg = message.text
+    if check_simple_question(msg):
+        user_data[message.chat.id]["Желание пройти практику в том же подразделении"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, напишите да или нет")
+        return 0
+
     user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
 def get_contact_channel_practice(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:")
 
@@ -679,7 +760,14 @@ def get_course_summer(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Период трудоустройства" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_employment_period_summer(message):
-    user_data[message.chat.id]["Период трудоустройства"] = message.text
+    msg = message.text
+    if check_dates(msg):
+        user_data[message.chat.id]["Период трудоустройства"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста,напишите период в формате дд.мм.гггг-дд.мм.гггг")
+        return 0
+
     user_data[message.chat.id]["step"] = "Опыт работы"
     bot.send_message(message.chat.id, "Работали ли Вы ранее, если да, то где?")
 
@@ -693,7 +781,14 @@ def get_previous_work_summer(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_contact_channel_summer(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:")
 
@@ -771,7 +866,14 @@ def get_course_post_study(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Сроки практики" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_practice_duration_post_study(message):
-    user_data[message.chat.id]["Сроки практики"] = message.text
+    msg = message.text
+    if check_dates(msg):
+        user_data[message.chat.id]["Сроки практики"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, впишите сроки в формате дд.мм.гггг-дд.мм.гггг")
+        return 0
+
     user_data[message.chat.id]["step"] = "Прошлая практика"
     bot.send_message(message.chat.id, "Проходили ли практику ранее? Если да, то где?")
 
@@ -785,14 +887,28 @@ def get_previous_practice_post_study(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Желание пройти практику в том же подразделении" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_same_department_post_study(message):
-    user_data[message.chat.id]["Желание пройти практику в том же подразделении"] = message.text
+    msg = message.text
+    if check_simple_question(msg):
+        user_data[message.chat.id]["Желание пройти практику в том же подразделении"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, напишите да или нет")
+        return 0
+
     user_data[message.chat.id]["step"] = "Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
 def get_contact_channel_post_study(message):
-    user_data[message.chat.id]["Канал связи"] = message.text
+    msg = message.text
+    if check_contact_channel(msg):
+        user_data[message.chat.id]["Канал связи"] = message.text
+    else:
+        bot.send_message(message.chat.id,
+                         "Пожалуйста, выберите вариант из меню снизу")
+        return 0
+
     user_data[message.chat.id]["step"] = "Номер телефона"
     bot.send_message(message.chat.id, "Введите ваш контактный номер телефона:")
 
