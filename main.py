@@ -732,7 +732,7 @@ def get_phone_number_post_study(message):
 # Общий обработчик для подтверждения отправки
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "confirm_send")
 def confirm_send(message):
-    if message.text.lower() == "отправить 📩":
+    if message.text.lower() == "📩 отправить":
         application_text = "\n".join(
             [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if key not in ["step", "form_type"]])
         form_type = user_data[message.chat.id].get("form_type")
