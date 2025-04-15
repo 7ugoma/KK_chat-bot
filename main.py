@@ -214,6 +214,12 @@ def get_memo_suz(message):
         bot.send_document(message.chat.id, file)
 
 
+#узнать, когда стипендия придет
+@bot.message_handler(func=lambda message: message.text == "💰 Узнать, когда придет стипендия" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+def get_scholarship_date_suz(message):
+    bot.send_message(message.chat.id, "Данный раздел находится пока в разработке", reply_markup=main_menu())
+
+
 #анкета другого вопроса
 @bot.message_handler(func=lambda message: message.text == "Задать другой вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def start_another_quest_suz(message):
@@ -419,6 +425,12 @@ def get_memo_vuz(message):
     bot.send_message(message.chat.id, "Вот ваша памятка:", reply_markup=back_to_main_menu())
     with open("Буклет ВУЗ.pdf", 'rb') as file:
         bot.send_document(message.chat.id, file)
+
+#узнать, когда стипендия придет
+@bot.message_handler(func=lambda message: message.text == "💰 Узнать, когда придет стипендия" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+def get_scholarship_date_suz(message):
+    bot.send_message(message.chat.id, "Данный раздел находится пока в разработке", reply_markup=main_menu())
+
 
 #задать другой вопрос
 @bot.message_handler(func=lambda message: message.text == "Задать другой вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
