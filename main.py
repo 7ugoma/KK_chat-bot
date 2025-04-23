@@ -177,6 +177,7 @@ def start(message):
 
 @bot.message_handler(func=lambda message: message.text == "🔙 Назад в меню")
 def back_to_main(message):
+    user_data[message.chat.id] = {"step": "", "form_type": ""}
     bot.send_message(message.chat.id, "Вы вернулись в главное меню:", reply_markup=main_menu())
 
 
@@ -950,8 +951,15 @@ def confirm_send(message):
                 bot.send_document(message.chat.id, file)
         del user_data[message.chat.id]
     elif message.text.lower() == "✏️ редактировать":
-        user_data[message.chat.id]["step"] = "ℹ️ Ф.И.О"
-        bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
+        if user_data[message.chat.id]["form_type"] == "Another Question":
+             user_data[message.chat.id]["step"] = "📝 Вопрос"
+             bot.send_message(message.chat.id, "Введите ваш вопрос")
+        elif user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question" or user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question":
+            user_data[message.chat.id]["step"] = "question"
+            bot.send_message(message.chat.id, "Введите ваш вопрос")
+        else:
+            user_data[message.chat.id]["step"] = "ℹ️ Ф.И.О"
+            bot.send_message(message.chat.id, "Введите ваше Ф.И.О:")
     else:
         bot.send_message(message.chat.id,
                          "Пожалуйста, напишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
