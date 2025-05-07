@@ -7,14 +7,21 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import re
 import phonenumbers
+import os
 
 TOKEN = ''
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
+admin_data = {}
 EMAIL_ADDRESS = ""
 PASSWORD = ""
 
+
+ADMIN_CREDENTIALS = {
+    "login": "",
+    "password": ""  
+}
 
 def send_email(subject, body, to_email):
     try:
@@ -42,7 +49,15 @@ def main_menu():
     markup.add(KeyboardButton("🎓 Целевое обучение"))
     markup.add(KeyboardButton("🗓 Мероприятия"))
     markup.add(KeyboardButton("💬 Другое"))
+    markup.add(KeyboardButton("👨‍💼 Админ"))  
     return markup
+    
+def admin_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(KeyboardButton("📤 Загрузить таблицу мероприятий"))
+    markup.add(KeyboardButton("📥 Скачать таблицу мероприятий"))
+    markup.add(KeyboardButton("🔙 Выйти из админ-панели"))
+    return markup    
 
 
 def job_menu():
@@ -170,6 +185,69 @@ def check_full_name(fio):
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id, "Привет!👋 Это виртуальный помощник от АО «Концерн Калашников» . Задайте свой вопрос или выберете один из предложенных вариантов.\n\nЧтобы вернуться в начало или запустить чат-бот заново, напишите\n/start", reply_markup=main_menu())
+
+@bot.message_handler(func=lambda message: message.text == "👨‍💼 Админ")
+def admin_login_start(message):
+    msg = bot.send_message(message.chat.id, "Введите логин:")
+    bot.register_next_step_handler(msg, admin_login_check)
+
+def admin_login_check(message):
+    login = message.text
+    admin_data[message.chat.id] = {"login": login}
+    msg = bot.send_message(message.chat.id, "Введите пароль:")
+    bot.register_next_step_handler(msg, admin_password_check)
+
+def admin_password_check(message):
+    password = message.text
+    login = admin_data[message.chat.id]["login"]
+    
+    if login == ADMIN_CREDENTIALS["login"] and password == ADMIN_CREDENTIALS["password"]:
+        bot.send_message(message.chat.id, "✅ Авторизация успешна!", reply_markup=admin_menu())
+        admin_data[message.chat.id]["authenticated"] = True
+    else:
+        bot.send_message(message.chat.id, "❌ Неверный логин или пароль", reply_markup=main_menu())
+        if message.chat.id in admin_data:
+            del admin_data[message.chat.id]
+ 
+@bot.message_handler(func=lambda message: message.text == "🔙 Выйти из админ-панели")
+def admin_logout(message):
+    if message.chat.id in admin_data:
+        del admin_data[message.chat.id]
+    bot.send_message(message.chat.id, "Вы вышли из админ-панели", reply_markup=main_menu())
+    
+@bot.message_handler(func=lambda message: message.text == "📤 Загрузить таблицу мероприятий" and 
+                     message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
+def request_upload_file(message):
+    msg = bot.send_message(message.chat.id, "Отправьте файл Excel с таблицей мероприятий (events.xlsx):")
+    bot.register_next_step_handler(msg, handle_upload_file)
+
+def handle_upload_file(message):
+    try:
+        if message.document:
+            file_info = bot.get_file(message.document.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+            
+            # Сохраняем файл
+            with open("events.xlsx", 'wb') as new_file:
+                new_file.write(downloaded_file)
+            
+            bot.send_message(message.chat.id, "✅ Таблица мероприятий успешно обновлена!", reply_markup=admin_menu())
+        else:
+            bot.send_message(message.chat.id, "❌ Пожалуйста, отправьте файл", reply_markup=admin_menu())
+    except Exception as e:
+        bot.send_message(message.chat.id, f"❌ Ошибка при загрузке файла: {str(e)}", reply_markup=admin_menu())
+
+@bot.message_handler(func=lambda message: message.text == "📥 Скачать таблицу мероприятий" and 
+                     message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
+def download_events_file(message):
+    try:
+        if os.path.exists("events.xlsx"):
+            with open("events.xlsx", 'rb') as file:
+                bot.send_document(message.chat.id, file, reply_markup=admin_menu())
+        else:
+            bot.send_message(message.chat.id, "❌ Файл мероприятий не найден", reply_markup=admin_menu())
+    except Exception as e:
+        bot.send_message(message.chat.id, f"❌ Ошибка при отправке файла: {str(e)}", reply_markup=admin_menu())
 
 
 @bot.message_handler(func=lambda message: message.text == "🔙 Назад в меню")
