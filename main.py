@@ -48,7 +48,7 @@ def main_menu():
     markup.add(KeyboardButton("💼 Трудоустройство/практика"))
     markup.add(KeyboardButton("🎓 Целевое обучение"))
     markup.add(KeyboardButton("🗓 Мероприятия"))
-    markup.add(KeyboardButton("💬 Другое"))
+    markup.add(KeyboardButton("💬 Задать свой вопрос"))
     markup.add(KeyboardButton("👨‍💼 Админ"))  
     return markup
     
@@ -268,7 +268,7 @@ def targeted_training(message):
 
 
 #меню ветки другое
-@bot.message_handler(func=lambda message: message.text == "💬 Другое")
+@bot.message_handler(func=lambda message: message.text == "💬 Задать свой вопрос")
 def ask_question_other(message):
     bot.send_message(message.chat.id, "Задайте свой вопрос:", reply_markup=back_to_main_menu())
     user_data[message.chat.id] = {"step": "📝 Вопрос", "form_type": "Another Question"}
