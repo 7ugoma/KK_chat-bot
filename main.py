@@ -185,7 +185,7 @@ def check_full_name(fio):
 @bot.message_handler(commands=['start'])
 def start(message):
     user_data[message.chat.id] = {}
-    bot.send_message(message.chat.id, "Привет!👋 Это виртуальный помощник от АО «Концерн Калашников» . Задайте свой вопрос или выберете один из предложенных вариантов.\n\nЧтобы вернуться в начало или запустить чат-бот заново, напишите\n/start", reply_markup=main_menu())
+    bot.send_message(message.chat.id, "Вы попали в главное меню.\n\nЧтобы вернуться сюда или запустить чат-бот заново, напишите\n/start", reply_markup=main_menu())
 
 @bot.message_handler(func=lambda message: message.text == "👨‍💼 Админ")
 def admin_login_start(message):
@@ -861,9 +861,20 @@ def get_employment_period_summer(message):
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "💼 Опыт работы" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
 def get_previous_work_summer(message):
-    user_data[message.chat.id]["💼 Опыт работы"] = message.text
-    user_data[message.chat.id]["step"] = "🌐 Канал связи"
-    bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+    msg = message.text
+    if "нет" in msg.lower() and len(msg.lower()) == 3:
+        user_data[message.chat.id]["💼 Опыт работы"] = msg
+        user_data[message.chat.id]["step"] = "🌐 Канал связи"
+        bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+    elif "да, " == msg.lower()[0:4]:
+        user_data[message.chat.id]["💼 Опыт работы"] = msg
+        user_data[message.chat.id]["step"] = "🌐 Канал связи"
+        bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
+    else:
+        bot.send_message(message.chat.id,
+                         """Пожалуйста, напишите либо "Нет", либо "Да" и где Вы работали через запятую""")
+        return 0
+
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🌐 Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
