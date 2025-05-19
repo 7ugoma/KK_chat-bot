@@ -111,6 +111,7 @@ def main_menu():
     markup.add(KeyboardButton("🎓 Целевое обучение"))
     markup.add(KeyboardButton("🗓 Мероприятия"))
     markup.add(KeyboardButton("💬 Задать свой вопрос"))
+    markup.add(KeyboardButton("ℹ️ Информация о Концерне Калашников"))
     markup.add(KeyboardButton("👨‍💼 Админ"))  
     return markup
 
@@ -264,7 +265,7 @@ def confirm_menu():
 def alr_studying_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add(KeyboardButton("📜 Получить памятку студента целевого обучения"))
-    markup.add(KeyboardButton("💰 Узнать, когда придет стипендия"))
+    markup.add(KeyboardButton("💰 Узнать сумму стипендии"))
     markup.add(KeyboardButton("❓ Задать другой вопрос"))
     return markup
 
@@ -330,6 +331,14 @@ def start(message):
     bot.send_message(message.chat.id,
                      "Привет!👋 Это виртуальный помощник от АО «Концерн Калашников» . Задайте свой вопрос или выберете один из предложенных вариантов.\n\nЧтобы вернуться в начало или запустить чат-бот заново, напишите\n/start",
                      reply_markup=main_menu())
+
+
+@bot.message_handler(func=lambda message: message.text == "ℹ️ Информация о Концерне Калашников")
+def admin_login_start(message):
+    with open("KK.jpg", 'rb') as file:
+        bot.send_document(message.chat.id, file)
+    bot.send_message(message.chat.id, """Акционерное общество "Концерн "Калашников" - это ведущее оборонное предприятие в сфере разработки стрелкового вооружения, спецтехники, станков и производства беспилотников.Мы уделяем особое внимание привлечению и закреплению перспективных студентов на предприятия""")
+
 
 
 @bot.message_handler(func=lambda message: message.text == "👨‍💼 Админ")
@@ -500,10 +509,12 @@ def get_memo_suz(message):
         bot.send_document(message.chat.id, file)
 
 
-#узнать, когда стипендия придет
-@bot.message_handler(func=lambda message: message.text == "💰 Узнать, когда придет стипендия" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
+#узнать, сколько стипендия придет
+@bot.message_handler(func=lambda message: message.text == "💰 Узнать сумму стипендии" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_scholarship_date_suz(message):
-    bot.send_message(message.chat.id, "Данный раздел находится пока в разработке 🛠️", reply_markup=main_menu())
+    bot.send_message(message.chat.id, "В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
+    with open("Корпоративная стипендия .xlsx", 'rb') as file:
+        bot.send_document(message.chat.id, file)
 
 
 #анкета другого вопроса
@@ -754,11 +765,12 @@ def get_memo_vuz(message):
     with open("Буклет ВУЗ.pdf", 'rb') as file:
         bot.send_document(message.chat.id, file)
 
-#узнать, когда стипендия придет
-@bot.message_handler(func=lambda message: message.text == "💰 Узнать, когда придет стипендия" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
+#узнать, сколько будет стипендия
+@bot.message_handler(func=lambda message: message.text == "💰 Узнать сумму стипендии" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_scholarship_date_suz(message):
-    bot.send_message(message.chat.id, "Данный раздел находится пока в разработке 🛠️", reply_markup=main_menu())
-
+    bot.send_message(message.chat.id, "В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
+    with open("Корпоративная стипендия .xlsx", 'rb') as file:
+        bot.send_document(message.chat.id, file)
 
 #задать другой вопрос
 @bot.message_handler(func=lambda message: message.text == "❓ Задать другой вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
