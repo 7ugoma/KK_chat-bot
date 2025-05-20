@@ -111,8 +111,7 @@ def main_menu():
     markup.add(KeyboardButton("🎓 Целевое обучение"))
     markup.add(KeyboardButton("🗓 Мероприятия"))
     markup.add(KeyboardButton("💬 Задать свой вопрос"))
-    markup.add(KeyboardButton("ℹ️ Информация о Концерне Калашников"))
-    markup.add(KeyboardButton("👨‍💼 Админ"))  
+    markup.add(KeyboardButton("""ℹ️ Информация об АО ‹Концерн ‹Калашников»"""))
     return markup
 
 
@@ -333,15 +332,14 @@ def start(message):
                      reply_markup=main_menu())
 
 
-@bot.message_handler(func=lambda message: message.text == "ℹ️ Информация о Концерне Калашников")
+@bot.message_handler(func=lambda message: message.text == """ℹ️ Информация об АО ‹Концерн ‹Калашников»""")
 def admin_login_start(message):
     with open("KK.jpg", 'rb') as file:
-        bot.send_document(message.chat.id, file)
+        bot.send_photo(message.chat.id, file)
     bot.send_message(message.chat.id, """Акционерное общество "Концерн "Калашников" - это ведущее оборонное предприятие в сфере разработки стрелкового вооружения, спецтехники, станков и производства беспилотников.Мы уделяем особое внимание привлечению и закреплению перспективных студентов на предприятия""")
 
 
-
-@bot.message_handler(func=lambda message: message.text == "👨‍💼 Админ")
+@bot.message_handler(commands=['admin'])
 def admin_login_start(message):
     msg = bot.send_message(message.chat.id, "Введите логин:")
     bot.register_next_step_handler(msg, admin_login_check)
