@@ -29,6 +29,8 @@ QUESTION_TYPES = [
     "SUZ another question",
     "Another Question"
 ]
+
+# функция отправки через почту
 def send_email(subject, body, to_email):
     try:
         msg = MIMEMultipart()
@@ -117,6 +119,8 @@ def main_menu():
 
 def admin_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(KeyboardButton("⬆️ Загрузить таблицу со стипендиями"))
+    markup.add(KeyboardButton("⬇️ Скачать таблицу со стипендиями"))
     markup.add(KeyboardButton("📤 Загрузить таблицу мероприятий"))
     markup.add(KeyboardButton("📥 Скачать таблицу мероприятий"))
     markup.add(KeyboardButton("📊 Скачать анкеты"))
@@ -124,16 +128,12 @@ def admin_menu():
     return markup
 
 
-@bot.message_handler(
-    func=lambda message: message.text == "📊 Скачать анкеты" and message.chat.id in admin_data and admin_data[
-        message.chat.id].get("authenticated", False))
+@bot.message_handler(func=lambda message: message.text == "📊 Скачать анкеты" and message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
 def download_forms_menu(message):
     bot.send_message(message.chat.id, "Выберите тип анкет для скачивания:", reply_markup=admin_forms_menu())
 
 
-@bot.message_handler(
-    func=lambda message: message.text == "💪 Анкеты практической подготовки" and message.chat.id in admin_data and
-                         admin_data[message.chat.id].get("authenticated", False))
+@bot.message_handler(func=lambda message: message.text == "💪 Анкеты практической подготовки" and message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
 def download_practice_forms(message):
     try:
         if os.path.exists(FORM_FILES["practice"]):
@@ -266,11 +266,12 @@ def alr_studying_menu():
     markup.add(KeyboardButton("📜 Получить памятку студента целевого обучения"))
     markup.add(KeyboardButton("💰 Узнать сумму стипендии"))
     markup.add(KeyboardButton("❓ Задать другой вопрос"))
+    markup.add(KeyboardButton("🔙 Назад в меню"))
     return markup
 
 
 # функции для проверок корректности ввода данных в анкетах
-# проверка корректности воода даты рождения
+# проверка корректности ввода даты рождения
 def check_contact_channel(channel):
     if str(channel).lower() in ["телефон", "whatsapp", "telegram"]:
         return True
@@ -278,7 +279,7 @@ def check_contact_channel(channel):
     else:
         return False
 
-
+# проверка правильности ввода простого вопроса
 def check_simple_question(answer):
     if str(answer).lower() in ["да", 'нет']:
         return True
@@ -286,9 +287,9 @@ def check_simple_question(answer):
     else:
         return False
 
-
+# Регулярное выражение для формата ДД.ММ.ГГГГ
 def check_dates(birthdate):
-    pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d-(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d$"  # Регулярное выражение для формата ДД.ММ.ГГГГ
+    pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d-(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d$"
 
     if re.match(pattern, birthdate):  # Проверка соответствия регулярному выражению
         return True
@@ -296,9 +297,9 @@ def check_dates(birthdate):
     else:
         return False
 
-
+ # Регулярное выражение для формата ДД.ММ.ГГГГ
 def check_birthdate(birthdate):
-    pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d$"  # Регулярное выражение для формата ДД.ММ.ГГГГ
+    pattern = r"^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(19|20)\d\d$"
     if re.match(pattern, birthdate):  # Проверка соответствия регулярному выражению
         return True
 
@@ -324,34 +325,34 @@ def check_full_name(fio):
     else:
         return False
 
-
+# сам старт бота
 @bot.message_handler(commands=['start'])
 def start(message):
     bot.send_message(message.chat.id,
                      "Привет!👋 Это виртуальный помощник от АО «Концерн Калашников» . Задайте свой вопрос или выберете один из предложенных вариантов.\n\nЧтобы вернуться в начало или запустить чат-бот заново, напишите\n/start",
                      reply_markup=main_menu())
 
-
+# отправка по нажатию кнопки информации о КК
 @bot.message_handler(func=lambda message: message.text == """ℹ️ Информация об АО ‹Концерн ‹Калашников»""")
 def admin_login_start(message):
     with open("KK.jpg", 'rb') as file:
         bot.send_photo(message.chat.id, file)
     bot.send_message(message.chat.id, """Акционерное общество "Концерн "Калашников" - это ведущее оборонное предприятие в сфере разработки стрелкового вооружения, спецтехники, станков и производства беспилотников.Мы уделяем особое внимание привлечению и закреплению перспективных студентов на предприятия""")
 
-
+# обработчик команды /admin
 @bot.message_handler(commands=['admin'])
 def admin_login_start(message):
     msg = bot.send_message(message.chat.id, "Введите логин:")
     bot.register_next_step_handler(msg, admin_login_check)
 
-
+# прием ввода админского логина и пароля
 def admin_login_check(message):
     login = message.text
     admin_data[message.chat.id] = {"login": login}
     msg = bot.send_message(message.chat.id, "Введите пароль:")
     bot.register_next_step_handler(msg, admin_password_check)
 
-
+# проверка правильности ввода данных логина и пароля
 def admin_password_check(message):
     password = message.text
     login = admin_data[message.chat.id]["login"]
@@ -364,22 +365,61 @@ def admin_password_check(message):
         if message.chat.id in admin_data:
             del admin_data[message.chat.id]
 
-
+# функция для выхода из меню админа
 @bot.message_handler(func=lambda message: message.text == "🔙 Выйти из админ-панели")
 def admin_logout(message):
     if message.chat.id in admin_data:
         del admin_data[message.chat.id]
     bot.send_message(message.chat.id, "Вы вышли из админ-панели", reply_markup=main_menu())
 
+# обработчик команды по замене таблицы со степендиями
+@bot.message_handler(func=lambda message: message.text == "⬆️ Загрузить таблицу со стипендиями" and
+                                          message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
+def request_upload_file_grants(message):
+    msg = bot.send_message(message.chat.id, "Отправьте файл Excel со стипендиями (стипендия.xlsx):")
+    bot.register_next_step_handler(msg, handle_upload_file_grants)
 
+# сам загрузчик и обработчик другой таблицы со стипендиями
+def handle_upload_file_grants(message):
+    try:
+        if message.document:
+            file_info = bot.get_file(message.document.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+
+            # Сохраняем файл
+            with open("стипендия.xlsx", 'wb') as new_file:
+                new_file.write(downloaded_file)
+
+            bot.send_message(message.chat.id, "✅ Таблица стипендий успешно обновлена!", reply_markup=admin_menu())
+        else:
+            bot.send_message(message.chat.id, "❌ Пожалуйста, отправьте файл", reply_markup=admin_menu())
+    except Exception as e:
+        bot.send_message(message.chat.id, f"❌ Ошибка при загрузке файла: {str(e)}", reply_markup=admin_menu())
+
+
+# отправка пользователю таблицы со стипендиями
+@bot.message_handler(func=lambda message: message.text == "⬇️ Скачать таблицу со стипендиями" and
+                                          message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
+def download_grants_file(message):
+    try:
+        if os.path.exists("стипендия.xlsx"):
+            with open("стипендия.xlsx", 'rb') as file:
+                bot.send_document(message.chat.id, file, reply_markup=admin_menu())
+        else:
+            bot.send_message(message.chat.id, "❌ Файл стипендий не найден", reply_markup=admin_menu())
+    except Exception as e:
+        bot.send_message(message.chat.id, f"❌ Ошибка при отправке файла: {str(e)}", reply_markup=admin_menu())
+
+
+
+# обработчик команды по смене таблицы
 @bot.message_handler(func=lambda message: message.text == "📤 Загрузить таблицу мероприятий" and
-                                          message.chat.id in admin_data and admin_data[message.chat.id].get(
-    "authenticated", False))
+                                          message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
 def request_upload_file(message):
     msg = bot.send_message(message.chat.id, "Отправьте файл Excel с таблицей мероприятий (events.xlsx):")
     bot.register_next_step_handler(msg, handle_upload_file)
 
-
+# обработчик самого файла с таблицей, чтобы заменить таблицу
 def handle_upload_file(message):
     try:
         if message.document:
@@ -396,7 +436,7 @@ def handle_upload_file(message):
     except Exception as e:
         bot.send_message(message.chat.id, f"❌ Ошибка при загрузке файла: {str(e)}", reply_markup=admin_menu())
 
-
+# отправка админу таблицы с мероприятиями
 @bot.message_handler(func=lambda message: message.text == "📥 Скачать таблицу мероприятий" and
                                           message.chat.id in admin_data and admin_data[message.chat.id].get(
     "authenticated", False))
@@ -410,13 +450,13 @@ def download_events_file(message):
     except Exception as e:
         bot.send_message(message.chat.id, f"❌ Ошибка при отправке файла: {str(e)}", reply_markup=admin_menu())
 
-
+# возврат в главное меню
 @bot.message_handler(func=lambda message: message.text == "🔙 Назад в меню")
 def back_to_main(message):
     user_data[message.chat.id] = {"step": "", "form_type": ""}
     bot.send_message(message.chat.id, "Вы вернулись в главное меню:", reply_markup=main_menu())
 
-
+# вход в ветку трудоустройства и практики
 @bot.message_handler(func=lambda message: message.text == "💼 Трудоустройство/практика")
 def employment_practice(message):
     bot.send_message(message.chat.id, "Выберите интересующий вас пункт:", reply_markup=job_menu())
@@ -429,19 +469,23 @@ def targeted_training(message):
     user_data[message.chat.id] = {"step": "ℹ️ Ф.И.О", "form_type": "SUZ another question"}
 
 
-#меню ветки другое
+# меню ветки другое
 @bot.message_handler(func=lambda message: message.text == "💬 Задать свой вопрос")
 def ask_question_other(message):
     bot.send_message(message.chat.id, "Задайте свой вопрос:", reply_markup=back_to_main_menu())
     user_data[message.chat.id] = {"step": "📝 Вопрос", "form_type": "Another Question"}
 
-#начало другого вопроса
+# начало другого вопроса
+
+
+# записывает вопрос, спрашивает фио
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "📝 Вопрос" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
 def get_another_quest_drugoe(message):
     user_data[message.chat.id]["📝 Вопрос"] = message.text
     user_data[message.chat.id]["step"] = "name"
     bot.send_message(message.chat.id, "Введите ваше Ф.И.О:", reply_markup=back_to_main_menu())
 
+# записывает имя, спрашивает канал связи и предлагает меню с выбором
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "name" and user_data.get(message.chat.id,{}).get("form_type") == "Another Question")
 def get_name_drugoe(message):
     msg = message.text
@@ -455,7 +499,7 @@ def get_name_drugoe(message):
     user_data[message.chat.id]["step"] = "🌐 Канал связи"
     bot.send_message(message.chat.id, "Выберите наиболее удобный канал связи:", reply_markup=contact_channel_menu())
 
-
+# записывает канал связи, проверяет корректность его ввода, спрашивает номер телефона
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🌐 Канал связи" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
 def get_contact_channel_drugoe(message):
     msg = message.text
@@ -507,11 +551,11 @@ def get_memo_suz(message):
         bot.send_document(message.chat.id, file)
 
 
-#узнать, сколько стипендия придет
+#узнать, сколько будет стипендия
 @bot.message_handler(func=lambda message: message.text == "💰 Узнать сумму стипендии" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
-def get_scholarship_date_suz(message):
+def get_scholarship_summ_suz(message):
     bot.send_message(message.chat.id, "В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
-    with open("Корпоративная стипендия .xlsx", 'rb') as file:
+    with open("стипендия.xlsx", 'rb') as file:
         bot.send_document(message.chat.id, file)
 
 
@@ -765,9 +809,9 @@ def get_memo_vuz(message):
 
 #узнать, сколько будет стипендия
 @bot.message_handler(func=lambda message: message.text == "💰 Узнать сумму стипендии" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
-def get_scholarship_date_suz(message):
+def get_scholarship_summ_suz(message):
     bot.send_message(message.chat.id, "В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
-    with open("Корпоративная стипендия .xlsx", 'rb') as file:
+    with open("стипендия.xlsx", 'rb') as file:
         bot.send_document(message.chat.id, file)
 
 #задать другой вопрос
