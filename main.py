@@ -814,7 +814,7 @@ def get_agreement_suz(message):
     application_text = "\n".join(
         [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if
          key not in ["step", "form_type"]])
-    bot.send_message(message.chat.id,f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+    bot.send_message(message.chat.id,f"Ваша анкета:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 ## конец анкеты целевого обучения ##
 ## конец ветки обучения в СУЗe ##
 
@@ -1176,7 +1176,7 @@ def get_agreement_practice(message):
     application_text = "\n".join(
         [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if
          key not in ["step", "form_type"]])
-    bot.send_message(message.chat.id,f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+    bot.send_message(message.chat.id,f"Ваша анкета:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 ## конец анкеты практической подготовки ##
 
 
@@ -1307,7 +1307,7 @@ def get_agreement_summer(message):
     application_text = "\n".join(
         [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if
          key not in ["step", "form_type"]])
-    bot.send_message(message.chat.id,f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+    bot.send_message(message.chat.id,f"Ваша анкета:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 ## конец ветки летнего трудоустройства ##
 
 
