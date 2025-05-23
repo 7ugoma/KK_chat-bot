@@ -12,17 +12,17 @@ import phonenumbers
 import os
 from datetime import datetime
 
-TOKEN = ''
+TOKEN = '7983356108:AAGiBAXrAHyk4RMSxE_d1QqGZMfUyN21lWg'
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
 admin_data = {}
-EMAIL_ADDRESS = ""
-PASSWORD = ""
+EMAIL_ADDRESS = "sustown82@gmail.com"
+PASSWORD = "iyxa rgwu ziwu yzoi"
 
 ADMIN_CREDENTIALS = {
-    "login": "",
-    "password": ""
+    "login": "admin",
+    "password": "admin123"
 }
 
 QUESTION_TYPES = [
@@ -1420,6 +1420,8 @@ def confirm_send(message):
                 bot.send_message(message.chat.id, "✔️ Анкета успешно сохранена!")
                 if pd.read_excel(FORM_FILES[form_type]).shape[0] >= 3:
                     send_email(f"Отправка анкеты {'практика' if form_type == 'practice' else 'летнее трудоустройство' if form_type == 'summer_employment' else 'трудоустройство после обучения' if form_type == 'post_study_employment' else 'целевое обучение в ВУЗе' if form_type=='entrance_vuz' else 'целевое обучение в СУЗе'}","",EMAIL_ADDRESS,filename=FORM_FILES[form_type])
+                    os.remove(FORM_FILES[form_type])
+
 
 
 
