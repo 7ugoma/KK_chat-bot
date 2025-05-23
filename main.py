@@ -206,13 +206,27 @@ def back_to_main_menu():
 
 def admin_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    markup.add(KeyboardButton("⬆️ Загрузить таблицу со стипендиями"))
-    markup.add(KeyboardButton("⬇️ Скачать таблицу со стипендиями"))
-    markup.add(KeyboardButton("📤 Загрузить таблицу мероприятий"))
-    markup.add(KeyboardButton("📥 Скачать таблицу мероприятий"))
     markup.add(KeyboardButton("📊 Скачать анкеты"))
+    markup.add(KeyboardButton("📅 Мероприятия"))
+    markup.add(KeyboardButton("💸 Стипендия"))
     markup.add(KeyboardButton("🔙 Выйти из админ-панели"))
     return markup
+
+def admin_grants_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(KeyboardButton("⬆️ Загрузить таблицу со стипендиями"))
+    markup.add(KeyboardButton("⬇️ Скачать таблицу со стипендиями"))
+    markup.add(KeyboardButton("🔙 Назад в админ-меню"))
+    return markup
+
+
+def admin_events_menu():
+    markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup.add(KeyboardButton("📤 Загрузить таблицу мероприятий"))
+    markup.add(KeyboardButton("📥 Скачать таблицу мероприятий"))
+    markup.add(KeyboardButton("🔙 Назад в админ-меню"))
+    return markup
+
 
 def admin_forms_menu():
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -223,7 +237,21 @@ def admin_forms_menu():
     markup.add(KeyboardButton("🏫 Анкеты целевого обучения в СУЗ"))
     markup.add(KeyboardButton("🔙 Назад в админ-меню"))
     return markup
+
 # конец блока с менюшками
+
+
+
+# меню для взаимодействия с таблицей мероприятий
+@bot.message_handler(func=lambda message: message.text == "📅 Мероприятия" and message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
+def download_forms_menu(message):
+    bot.send_message(message.chat.id, "Выберите возможные действия с таблицей мероприятий:", reply_markup=admin_events_menu())
+
+
+# меню для взаимодействия с таблицей стипендий
+@bot.message_handler(func=lambda message: message.text == "💸 Стипендия" and message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
+def download_forms_menu(message):
+    bot.send_message(message.chat.id, "Выберите возможные действия с таблицей стипендий:", reply_markup=admin_grants_menu())
 
 
 
@@ -233,6 +261,8 @@ def download_forms_menu(message):
     bot.send_message(message.chat.id, "Выберите тип анкет для скачивания:", reply_markup=admin_forms_menu())
 
 
+
+# сами анкеты
 @bot.message_handler(func=lambda message: message.text == "💪 Анкеты практической подготовки" and message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
 def download_practice_forms(message):
     try:
@@ -291,10 +321,15 @@ def download_suz_forms(message):
         bot.send_message(message.chat.id, f"❌ Ошибка при отправке файла: {str(e)}", reply_markup=admin_forms_menu())
 # конец блока со скачиванием таблиц
 
+
+
 # возврат в админ меню
 @bot.message_handler(func=lambda message: message.text == "🔙 Назад в админ-меню" and message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
 def back_to_admin_menu(message):
     bot.send_message(message.chat.id, "Вы вернулись в админ-меню:", reply_markup=admin_menu())
+
+
+
 
 
 
@@ -988,6 +1023,10 @@ def get_agreement_another_suz(message):
          key not in ["step", "form_type"]])
     bot.send_message(message.chat.id,f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
 
+
+
+
+
 # Анкета для "Практическая подготовка"
 @bot.message_handler(func=lambda message: message.text == "💪 Практическая подготовка")
 def start_practice_form(message):
@@ -1128,6 +1167,10 @@ def get_agreement_practice(message):
         [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if
          key not in ["step", "form_type"]])
     bot.send_message(message.chat.id,f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+# конец анкеты практической подготовки
+
+
+
 
 # Анкета для "Летнее трудоустройство"
 @bot.message_handler(func=lambda message: message.text == "☀️ Летнее трудоустройство")
@@ -1256,6 +1299,10 @@ def get_agreement_summer(message):
         [f"{key}: {value}" for key, value in user_data[message.chat.id].items() if
          key not in ["step", "form_type"]])
     bot.send_message(message.chat.id,f"Ваш вопрос:\n\n{application_text}\n\nНапишите 'Отправить' для подтверждения отправки или 'Редактировать' для изменения данных.",reply_markup=confirm_menu())
+# конец ветки летнего трудоустройства
+
+
+
 
 # Анкета для "Трудоустройство после обучения"
 @bot.message_handler(func=lambda message: message.text == "👨🏼‍🎓 Трудоустройство после обучения")
