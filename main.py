@@ -12,17 +12,17 @@ import phonenumbers
 import os
 from datetime import datetime
 
-TOKEN = '7983356108:AAGiBAXrAHyk4RMSxE_d1QqGZMfUyN21lWg'
+TOKEN = ''
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
 admin_data = {}
-EMAIL_ADDRESS = "sustown82@gmail.com"
-PASSWORD = "iyxa rgwu ziwu yzoi"
+EMAIL_ADDRESS = ""
+PASSWORD = ""
 
 ADMIN_CREDENTIALS = {
-    "login": "admin",
-    "password": "admin123"
+    "login": "",
+    "password": ""
 }
 
 QUESTION_TYPES = [
