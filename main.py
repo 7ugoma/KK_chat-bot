@@ -28,17 +28,17 @@ from datetime import datetime
 # трудоустройство/практика: анкета трудоустройства после практики
 # функции отправки на почту, сохранения в excel, создания excel таблиц
 
-TOKEN = ''
+TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 user_data = {}
 admin_data = {}
-EMAIL_ADDRESS = ""
-PASSWORD = ""
+EMAIL_ADDRESS = os.getenv("GMAIL")
+PASSWORD = os.getenv("GMAIL_PASS")
 
 ADMIN_CREDENTIALS = {
-    "login": "",
-    "password": ""
+    "login": os.getenv("ADMIN_LOG"),
+    "password": os.getenv("ADMIN_PASS")
 }
 
 QUESTION_TYPES = [
