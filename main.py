@@ -303,7 +303,7 @@ def download_suz_forms(message):
 def admin_logout(message):
     if message.chat.id in admin_data:
         del admin_data[message.chat.id]
-    bot.send_message(message.chat.id, "Вы вышли из админ-панели", reply_markup=main_menu())
+    bot.send_message(message.chat.id, "🚪 Вы вышли из админ-панели", reply_markup=main_menu())
 
 
 # обработчик команды по замене таблицы со стипендиями
@@ -390,7 +390,7 @@ def download_events_file(message):
 # возврат в админ меню
 @bot.message_handler(func=lambda message: message.text == "🔙 Назад в админ-меню" and message.chat.id in admin_data and admin_data[message.chat.id].get("authenticated", False))
 def back_to_admin_menu(message):
-    bot.send_message(message.chat.id, "Вы вернулись в админ-меню:", reply_markup=admin_menu())
+    bot.send_message(message.chat.id, "👔 Вы вернулись в админ-меню:", reply_markup=admin_menu())
 
 ### КОНЕЦ АДМИНСКОГО МЕНЮ ###
 
@@ -463,7 +463,7 @@ def check_full_name(fio):
 # обработчик команды start
 @bot.message_handler(commands=['start'])
 def start(message):
-    bot.send_message(message.chat.id, "Вы попали в главное меню.\nЧтобы вернуться сюда или запустить чат-бот заново, напишите\n/start", reply_markup=main_menu())
+    bot.send_message(message.chat.id, "Вы попали в главное меню 🏠\nЧтобы вернуться сюда или запустить чат-бот заново, напишите ✍\n/start", reply_markup=main_menu())
 
 # обработчик команды /admin
 @bot.message_handler(commands=['admin'])
@@ -476,7 +476,7 @@ def admin_login_start(message):
 @bot.message_handler(func=lambda message: message.text == "🔙 Назад в меню")
 def back_to_main(message):
     user_data[message.chat.id] = {"step": "", "form_type": ""}
-    bot.send_message(message.chat.id, "Вы вернулись в главное меню:", reply_markup=main_menu())
+    bot.send_message(message.chat.id, "🏠 Вы вернулись в главное меню:", reply_markup=main_menu())
 
 
 # отправка по нажатию кнопки информации о КК
@@ -514,7 +514,7 @@ def show_events(message):
                 print(f"❌ Неверный URL для мероприятия: {event_name}")
 
         if not markup.keyboard:
-            bot.send_message(message.chat.id, "На данный момент нет доступных мероприятий.")
+            bot.send_message(message.chat.id, "На данный момент нет доступных мероприятий 😞")
             return
 
         back_markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -586,7 +586,7 @@ def get_phone_number_drugoe(message):
         bot.send_message(message.chat.id, "Пожалуйста, проверьте корректность ввода данных: +71234567890")
         return 0
     user_data[message.chat.id]["step"] = "Согласие на обработку данных"
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "Another Question")
@@ -640,7 +640,7 @@ def get_memo_suz(message):
 # узнать, сколько будет стипендия
 @bot.message_handler(func=lambda message: message.text == "💰 Узнать сумму стипендии" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
 def get_scholarship_summ_suz(message):
-    bot.send_message(message.chat.id, "В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
+    bot.send_message(message.chat.id, "👉 В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
     with open("стипендия.xlsx", 'rb') as file:
         bot.send_document(message.chat.id, file)
 
@@ -697,7 +697,7 @@ def get_phone_number_another_suz(message):
         return 0
     user_data[message.chat.id]["step"] = "🔏Согласие на обработку данных"
 
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🔏Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ another question")
@@ -796,7 +796,7 @@ def get_phone_number_suz(message):
         return 0
     user_data[message.chat.id]["step"] = "🔏Согласие на обработку данных"
 
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🔏Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "SUZ")
@@ -910,7 +910,7 @@ def get_phone_number_entrance_vuz(message):
         return 0
     user_data[message.chat.id]["step"] = "🔏Согласие на обработку данных"
 
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🔏Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "entrance_vuz")
@@ -952,7 +952,7 @@ def get_memo_vuz(message):
 # узнать, сколько будет стипендия
 @bot.message_handler(func=lambda message: message.text == "💰 Узнать сумму стипендии" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
 def get_scholarship_summ_suz(message):
-    bot.send_message(message.chat.id, "В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
+    bot.send_message(message.chat.id, "👉 В файле находится актуальная информация по суммам стипендий:", reply_markup=back_to_main_menu())
     with open("стипендия.xlsx", 'rb') as file:
         bot.send_document(message.chat.id, file)
 
@@ -1006,7 +1006,7 @@ def get_phone_number_another_suz(message):
         return 0
     user_data[message.chat.id]["step"] = "🔏Согласие на обработку данных"
 
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🔏Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "VUZ another question")
@@ -1158,7 +1158,7 @@ def get_phone_number_practice(message):
         return 0
     user_data[message.chat.id]["step"] = "🔏Согласие на обработку данных"
 
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🔏Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "practice")
@@ -1289,7 +1289,7 @@ def get_phone_number_summer(message):
         return 0
     user_data[message.chat.id]["step"] = "🔏Согласие на обработку данных"
 
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🔏Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "summer_employment")
@@ -1433,7 +1433,7 @@ def get_phone_number_post_study(message):
         return 0
     user_data[message.chat.id]["step"] = "🔏Согласие на обработку данных"
 
-    bot.send_message(message.chat.id,f"Согласны ли Вы на обработку персональных данных?", reply_markup=simple_question())
+    bot.send_message(message.chat.id,f"Я даю согласие на сбор и хранение моих персональных данных через Телеграмм и передачу их для обработки в АО «Концерн «Калашников». Вы это подтверждаете?", reply_markup=simple_question())
 
 
 @bot.message_handler(func=lambda message: user_data.get(message.chat.id, {}).get("step") == "🔏Согласие на обработку данных" and user_data.get(message.chat.id, {}).get("form_type") == "post_study_employment")
@@ -1541,7 +1541,7 @@ def confirm_send(message):
             if send_email(subject, application_text, EMAIL_ADDRESS):
                 bot.send_message(message.chat.id, "✔️ Вопрос успешно отправлен!")
             else:
-                bot.send_message(message.chat.id, "❌ Ошибка при отправке вопроса.")
+                bot.send_message(message.chat.id, "❌ Ошибка при отправке вопроса")
 
         # Если это анкета - сохраняем в Excel
         else:
@@ -1554,10 +1554,10 @@ def confirm_send(message):
                     os.remove(FORM_FILES[form_type])
 
             else:
-                bot.send_message(message.chat.id, "❌ Ошибка при сохранении анкеты.")
+                bot.send_message(message.chat.id, "❌ Ошибка при сохранении анкеты")
 
         bot.send_message(message.chat.id, f"Данные:\n\n{application_text}")
-        bot.send_message(message.chat.id, "Спасибо за обращение! Мы свяжемся с вами в ближайшее время.",
+        bot.send_message(message.chat.id, "Спасибо за обращение! 😊 Мы свяжемся с вами в ближайшее время 😉",
                          reply_markup=main_menu())
 
         if form_type in ["practice", "summer_employment", "post_study_employment"]:
